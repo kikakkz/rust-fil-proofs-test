@@ -10,5 +10,5 @@ edition = "2018"
 slog = "2.4.1"
 slog-term = "2.4.0"
 slog-json = "2.3.0"
-slog-async = "2.3.0"
+slog-async = { git = "https://github.com/slog-rs/async.git" }
 lazy_static = "1.2"
