@@ -241,17 +241,17 @@ impl HashFunction<PoseidonDomain> for PoseidonFunction {
         left: &num::AllocatedNum<E>,
         right: &num::AllocatedNum<E>,
         _height: usize,
-        params: &E::Params,
+        _params: &E::Params,
     ) -> ::std::result::Result<num::AllocatedNum<E>, SynthesisError> {
-        let mut preimage = vec![left.clone(), right.clone()];
+        let preimage = vec![left.clone(), right.clone()];
 
         poseidon_hash_simple::<CS, E>(cs, preimage)
     }
 
     fn hash_circuit<E: JubjubEngine, CS: ConstraintSystem<E>>(
-        cs: CS,
-        bits: &[boolean::Boolean],
-        params: &E::Params,
+        _cs: CS,
+        _bits: &[boolean::Boolean],
+        _params: &E::Params,
     ) -> std::result::Result<num::AllocatedNum<E>, SynthesisError> {
         unimplemented!();
     }
