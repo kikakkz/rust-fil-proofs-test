@@ -220,20 +220,7 @@ fn poseidon_hash(data: &[u8]) -> PoseidonDomain {
 impl HashFunction<PoseidonDomain> for PoseidonFunction {
     //fn hash<E: JubjubEngine>(data: &[u8]) -> PoseidonDomain {
     fn hash(data: &[u8]) -> PoseidonDomain {
-        // FIXME: We shouldn't unwrap here, but doing otherwise will require an interface change.
-        // We could truncate so `bytes_into_frs` cannot fail, then ensure `data` is always `fr_safe`.
-
         poseidon_hash(data)
-        // let preimage = data
-        //     .chunks(32)
-        //     .map(|ref chunk| {
-        //         <Bls12 as ff::ScalarEngine>::Fr::from_repr(PoseidonDomain::from_slice(chunk).0)
-        //             .unwrap()
-        //     })
-        //     .collect::<Vec<_>>();
-
-        // let fr: <Bls12 as ScalarEngine>::Fr = poseidon::<Bls12>(&preimage);
-        // fr.into()
     }
 
     fn hash_leaf_circuit<E: JubjubEngine, CS: ConstraintSystem<E>>(
@@ -348,18 +335,9 @@ mod tests {
         let t =
             MerkleTree::<PoseidonDomain, PoseidonFunction>::new(leaves.iter().map(|x| *x)).unwrap();
 
-        // assert_eq!(t.leafs(), 4);
+        assert_eq!(t.leafs(), 4);
 
         let mut a = PoseidonFunction::default();
-        // let leaves: Vec<PoseidonDomain> = values
-        //     .iter()
-        //     .map(|v| {
-        //         v.hash(&mut a);
-        //         let h = a.hash();
-        //         a.reset();
-        //         h
-        //     })
-        //     .collect();
 
         assert_eq!(t.read_at(0).unwrap(), leaves[0]);
         assert_eq!(t.read_at(1).unwrap(), leaves[1]);
