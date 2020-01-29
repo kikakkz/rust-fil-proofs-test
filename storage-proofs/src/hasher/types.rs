@@ -73,7 +73,9 @@ pub trait HashFunction<T: Domain>:
         right: &[boolean::Boolean],
         height: usize,
         params: &E::Params,
-    ) -> std::result::Result<num::AllocatedNum<E>, SynthesisError>;
+    ) -> std::result::Result<num::AllocatedNum<E>, SynthesisError> {
+        unimplemented!();
+    }
 
     fn hash_circuit<E: JubjubEngine, CS: ConstraintSystem<E>>(
         cs: CS,
