@@ -447,39 +447,39 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
                             chunked_nodes_count
                         ];
 
+                    // Allocate layer data array and insert a placeholder for each layer.
+                    let mut layer_data = Vec::with_capacity(layers);
+                    for _ in 0..layers {
+                        layer_data.push(Vec::new());
+                    }
+
                     rayon::scope(|s| {
-                        let n = num_cpus::get();
+                        // capture a shadowed version of layer_data
+                        let layer_data: &mut Vec<_> = &mut layer_data;
 
-                        // only split if we have at least two elements per thread
-                        let num_chunks = if n > chunked_nodes_count * 2 { 1 } else { n };
-
-                        // chunk into n chunks
-                        let chunk_size =
-                            (chunked_nodes_count as f64 / num_chunks as f64).ceil() as usize;
-
-                        // gather all n chunks in parallel
-                        for (chunk, columns_chunk) in columns.chunks_mut(chunk_size).enumerate() {
+                        // gather all layer data in parallel
+                        s.spawn(move |_| {
                             let labels = &labels;
+                            for k in 1..=layers {
+                                let store = labels.labels_for_layer(k);
+                                let start = (i * nodes_count) + node_index;
+                                let end = start + chunked_nodes_count;
+                                let elements: Vec<<Tree::Hasher as Hasher>::Domain> =
+                                    store.read_range(std::ops::Range { start, end }).unwrap();
 
-                            s.spawn(move |_| {
-                                for (j, hash) in columns_chunk.iter_mut().enumerate() {
-                                    for k in 1..=layers {
-                                        let store = labels.labels_for_layer(k);
-                                        let el: <Tree::Hasher as Hasher>::Domain = store
-                                            .read_at(
-                                                (i * nodes_count)
-                                                    + node_index
-                                                    + j
-                                                    + chunk * chunk_size,
-                                            )
-                                            .unwrap();
-
-                                        hash[k - 1] = el.into();
-                                    }
-                                }
-                            });
-                        }
+                                let fr_elements: Vec<_> =
+                                    elements.into_iter().map(|el| el.into()).collect();
+                                layer_data[k - 1] = fr_elements;
+                            }
+                        });
                     });
+
+                    // Copy out all layer data arranged into columns.
+                    for layer_index in 0..layers {
+                        for index in 0..chunked_nodes_count {
+                            columns[index][layer_index] = layer_data[layer_index][index];
+                        }
+                    }
 
                     node_index += chunked_nodes_count;
                     trace!(
