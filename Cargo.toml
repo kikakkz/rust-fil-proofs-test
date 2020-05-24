@@ -7,5 +7,7 @@ members = [
   "storage-proofs/porep",
   "storage-proofs/post",
   "fil-proofs-tooling",
-  "sha2raw"
+  "sha2raw",
+  "apps/sealing",
+  "apps/create-label"
 ]
