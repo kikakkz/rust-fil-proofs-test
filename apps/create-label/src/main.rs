@@ -21,7 +21,7 @@ use chrono::prelude::*;
 
 const SIZE: usize = 2 * 1024;
 const ARRAY: [u8; SIZE] = [0; SIZE];
-const LAYERS: i8 = 1;
+const LAYERS: i8 = 2;
 
 fn main() {
     fil_logger::init();
@@ -35,7 +35,7 @@ fn main() {
     ).expect("Fail to create stackdrg");
 
     dt = Local::now();
-    println!("Construct graph within {}", dt.timestamp_millis() - start);
+    println!("Construct graph within {} ms", dt.timestamp_millis() - start);
     start = dt.timestamp_millis();
 
     let _data_tree: DataTree =
@@ -46,12 +46,12 @@ fn main() {
     let replica_id = Sha256Domain::default();
 
     dt = Local::now();
-    println!("Create merkle tree within {}", dt.timestamp_millis() - start);
+    println!("Create merkle tree within {} ms", dt.timestamp_millis() - start);
     start = dt.timestamp_millis();
     let label_start = start;
 
     let layers = LAYERS;
-    println!("create Layer at {}", dt.timestamp_millis());
+    println!("Create Layer at {} nodes {}", dt.timestamp_millis(), graph.size());
 
     for layer in 1..=layers {
         if 1 == layer {
@@ -66,11 +66,11 @@ fn main() {
             }
         }
         dt = Local::now();
-        println!("Create layer {} within {}", layer, dt.timestamp_millis() - start);
+        println!("Create layer {} within {} ms", layer, dt.timestamp_millis() - start);
         start = dt.timestamp_millis();
     }
 
     dt = Local::now();
-    println!("Create layers within {}", dt.timestamp_millis() - label_start);
+    println!("Create layers within {} ms", dt.timestamp_millis() - label_start);
     println!("Create done at {}", dt.timestamp_millis());
 }
