@@ -19,8 +19,9 @@ use storage_proofs::hasher::Sha256Domain;
 extern crate chrono;
 use chrono::prelude::*;
 
-const SIZE: usize = 1 * 1024 * 1024;
+const SIZE: usize = 2 * 1024;
 const ARRAY: [u8; SIZE] = [0; SIZE];
+const LAYERS: i8 = 1;
 
 fn main() {
     fil_logger::init();
@@ -49,7 +50,7 @@ fn main() {
     start = dt.timestamp_millis();
     let label_start = start;
 
-    let layers = 11;
+    let layers = LAYERS;
     println!("create Layer at {}", dt.timestamp_millis());
 
     for layer in 1..=layers {
