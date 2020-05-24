@@ -8,3 +8,6 @@ heaptrack*
 *.profile
 *.heap
 rust-fil-proofs.config.toml
+*.swp
+main
+*.dis
