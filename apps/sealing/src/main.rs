@@ -7,8 +7,8 @@ extern crate paired;
 use rand::{Rng, SeedableRng};
 use filecoin_proofs::*;
 use rand_xorshift::XorShiftRng;
-use storage_proofs::hasher::Hasher;
-use paired::bls12_381::Fr;
+// use storage_proofs::hasher::Hasher;
+// use paired::bls12_381::Fr;
 
 const SEED: [u8; 16] = [
     0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06, 0xbc, 0xe5,
@@ -19,11 +19,11 @@ fn main() {
 
     let file = std::fs::File::open("/opt/data/source/3rd/filecoin-project/rust-fil-proofs/tt").expect("failed");
     let unsealed = std::fs::File::create("PPPiece.ttt").expect("failed");
-    let (piece_info, n) = filecoin_proofs::add_piece(&file, &unsealed,
+    let (piece_info, _) = filecoin_proofs::add_piece(&file, &unsealed,
                                filecoin_proofs::UnpaddedBytesAmount(2032),
                                &[]).expect("failed");
     let piece_infos = vec![piece_info];
-    let sealed = std::fs::File::create("PPPiece.ttt.sealed").expect("failed");
+    let _sealed = std::fs::File::create("PPPiece.ttt.sealed").expect("failed");
 
     let config = PoRepConfig {
         sector_size: SectorSize(2048),
@@ -35,7 +35,7 @@ fn main() {
     let rng = &mut XorShiftRng::from_seed(SEED);
     let ticket = rng.gen();
     let sector_id = rng.gen::<u64>().into();
-    let mut prover_id = [0u8; 32];
+    let prover_id = [0u8; 32];
     // let prover_fr: <Tree::Hasher as Hasher>::Domain = Fr::random(rng).into();
     // prover_id.copy_from_slice(AsRef::<[u8]>::as_ref(&prover_fr));
 
