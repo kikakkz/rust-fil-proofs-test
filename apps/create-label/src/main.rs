@@ -19,8 +19,7 @@ use storage_proofs::hasher::Sha256Domain;
 extern crate chrono;
 use chrono::prelude::*;
 
-const SIZE: usize = 2 * 1024;
-const ARRAY: [u8; SIZE] = [0; SIZE];
+const SIZE: usize = 32 * 1024 * 1024 * 1024;
 const LAYERS: i8 = 2;
 
 fn main() {
@@ -28,6 +27,7 @@ fn main() {
 
     let mut dt = Local::now();
     let mut start = dt.timestamp_millis();
+	let array = vec![0; SIZE];
 
     println!("create DRG at {}", dt.timestamp_millis());
     let graph = StackedBucketGraph::<DefaultPieceHasher>::new_stacked(
@@ -39,7 +39,7 @@ fn main() {
     start = dt.timestamp_millis();
 
     let _data_tree: DataTree =
-        create_base_merkle_tree::<DataTree>(None, graph.size(), &ARRAY).expect("fail");
+        create_base_merkle_tree::<DataTree>(None, graph.size(), &array).expect("fail");
 
     let layer_size = graph.size() * NODE_SIZE;
     let mut labels_buffer = vec![0u8; 2 * layer_size];
