@@ -17,7 +17,7 @@ use storage_proofs::merkle::create_base_merkle_tree;
 extern crate chrono;
 use chrono::prelude::*;
 
-const SIZE: usize = 1 * 1024 * 1024;
+const SIZE: usize = 32 * 1024 * 1024 * 1024;
 
 fn main() {
     fil_logger::init();

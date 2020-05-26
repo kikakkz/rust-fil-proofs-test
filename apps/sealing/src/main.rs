@@ -17,18 +17,18 @@ const SEED: [u8; 16] = [
 fn main() {
     fil_logger::init();
 
-    let file = std::fs::File::open("/opt/data/source/3rd/filecoin-project/rust-fil-proofs/tt").expect("failed");
+    let file = std::fs::File::open("/home/yt/.lotusstorage/unsealed/s-t0121479-0").expect("failed");
     let unsealed = std::fs::File::create("PPPiece.ttt").expect("failed");
     let (piece_info, _) = filecoin_proofs::add_piece(&file, &unsealed,
-                               filecoin_proofs::UnpaddedBytesAmount(2032),
+                               filecoin_proofs::UnpaddedBytesAmount(34359738368-21-270549100+2130308-16774+131),
                                &[]).expect("failed");
     let piece_infos = vec![piece_info];
     let _sealed = std::fs::File::create("PPPiece.ttt.sealed").expect("failed");
 
     let config = PoRepConfig {
-        sector_size: SectorSize(2048),
+        sector_size: SectorSize(34359738368),
         partitions: PoRepProofPartitions(
-            *POREP_PARTITIONS.read().unwrap().get(&2048).unwrap(),
+            *POREP_PARTITIONS.read().unwrap().get(&34359738368).unwrap(),
         ),
     };
 

@@ -11,3 +11,5 @@ rust-fil-proofs.config.toml
 *.swp
 main
 *.dis
+*.ttt*
+cache
