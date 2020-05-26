@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	start := time.Now().UnixNano()
 	buf := make([]byte, 9728)
-	for i := 0; i < 64; i++ {
+	start := time.Now().UnixNano()
+	for i := 0; i < 65535; i++ {
 		buf[0] = byte(i)
 		sha256.Sum256(buf)
 		if 0 == i%10000000 {

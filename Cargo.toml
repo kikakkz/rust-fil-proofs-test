@@ -9,5 +9,6 @@ members = [
   "fil-proofs-tooling",
   "sha2raw",
   "apps/sealing",
-  "apps/create-label"
+  "apps/create-label",
+  "apps/merkle-tree"
 ]

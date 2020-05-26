@@ -201,6 +201,7 @@ pub fn create_base_merkle_tree<Tree: MerkleTreeTrait>(
             .expect("failed to convert node data to domain element")
     };
 
+    trace!("create_merkle_tree start");
     let tree = match config {
         Some(x) => merkle::MerkleTree::<
             <Tree::Hasher as Hasher>::Domain,
@@ -219,6 +220,7 @@ pub fn create_base_merkle_tree<Tree: MerkleTreeTrait>(
             Tree::TopTreeArity,
         >::from_par_iter((0..size).into_par_iter().map(f)),
     }?;
+    trace!("create_merkle_tree done");
 
     Ok(Tree::from_merkle(tree))
 }
