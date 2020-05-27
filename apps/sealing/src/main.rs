@@ -17,13 +17,13 @@ const SEED: [u8; 16] = [
 fn main() {
     fil_logger::init();
 
-    let file = std::fs::File::open("/home/yt/.lotusstorage/unsealed/s-t0121479-0").expect("failed");
-    let unsealed = std::fs::File::create("PPPiece.ttt").expect("failed");
+    let file = std::fs::File::open("/home/yt/test/s-t0121479-0").expect("failed");
+    let unsealed = std::fs::File::create("/home/yt/test/PPPiece.ttt").expect("failed");
     let (piece_info, _) = filecoin_proofs::add_piece(&file, &unsealed,
                                filecoin_proofs::UnpaddedBytesAmount(34359738368-21-270549100+2130308-16774+131),
                                &[]).expect("failed");
     let piece_infos = vec![piece_info];
-    let _sealed = std::fs::File::create("PPPiece.ttt.sealed").expect("failed");
+    let _sealed = std::fs::File::create("/home/yt/test/PPPiece.ttt.sealed").expect("failed");
 
     let config = PoRepConfig {
         sector_size: SectorSize(34359738368),
@@ -41,9 +41,9 @@ fn main() {
 
     let phase1_out = filecoin_proofs::seal_pre_commit_phase1::<_, _, _, Tree>(
         config,
-        "cache",
-        "PPPiece.ttt",
-        "PPPiece.ttt.sealed",
+        "/home/yt/test/cache",
+        "/home/yt/test/PPPiece.ttt",
+        "/home/yt/test/PPPiece.ttt.sealed",
         prover_id,
         sector_id,
         ticket,
@@ -51,7 +51,7 @@ fn main() {
     ).expect("failed");
 
     let pre_commit_out = filecoin_proofs::seal_pre_commit_phase2(
-        config, phase1_out, "cache", "PPPiece.ttt.sealed").expect("failed");
+        config, phase1_out, "/home/yt/test/cache", "/home/yt/test/PPPiece.ttt.sealed").expect("failed");
 
     let seed = rng.gen();
 
@@ -60,8 +60,8 @@ fn main() {
 
     let phase1_out = filecoin_proofs::seal_commit_phase1::<_, Tree>(
         config,
-        "cache",
-        "PPPiece.ttt.sealed",
+        "/home/yt/test/cache",
+        "/home/yt/test/PPPiece.ttt.sealed",
         prover_id,
         sector_id,
         ticket,

@@ -251,6 +251,7 @@ where
         let n = PaddedBytesAmount(n as u64);
         let n: UnpaddedBytesAmount = n.into();
 
+		println!("n {} ps {}", u64::from(n), u64::from(piece_size));
         ensure!(n == piece_size, "add_piece: invalid bytes amount written");
 
         // write right alignment
