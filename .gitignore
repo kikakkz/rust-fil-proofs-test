@@ -12,3 +12,5 @@ rust-fil-proofs.config.toml
 main
 *.dis
 *.log
+*.ttt*
+cache

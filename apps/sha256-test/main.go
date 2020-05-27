@@ -12,8 +12,9 @@ func main() {
 	for i := 0; i < 65535; i++ {
 		buf[0] = byte(i)
 		sha256.Sum256(buf)
-		if 0 == i%10000000 {
-			fmt.Printf("\r%d:%v", i, time.Now().UnixNano())
+		if 0 == i%1000000 {
+			fmt.Printf("\r%d:%v/%v ms", i, time.Now().UnixNano(),
+				(time.Now().UnixNano() - start)/1000000)
 		}
 	}
 	end := time.Now().UnixNano()
