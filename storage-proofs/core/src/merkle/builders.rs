@@ -197,8 +197,9 @@ pub fn create_base_merkle_tree<Tree: MerkleTreeTrait>(
         // that isn't caught by the FPS API.
         // Unfortunately, it's not clear how to perform this error-handling in the parallel
         // iterator case.
-        <Tree::Hasher as Hasher>::Domain::try_from_bytes(d)
-            .expect("failed to convert node data to domain element")
+        let r = <Tree::Hasher as Hasher>::Domain::try_from_bytes(d)
+            .expect("failed to convert node data to domain element");
+        r
     };
 
     trace!("create_merkle_tree start");
