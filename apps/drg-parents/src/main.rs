@@ -20,7 +20,7 @@ const DEGREE: usize = BASE_DEGREE + EXP_DEGREE;
 extern crate chrono;
 use chrono::prelude::*;
 
-const SIZE: usize = 1 * 1024 * 1024;
+const SIZE: usize = 1024;
 const LAYERS: i8 = 2;
 
 fn main() {
@@ -48,12 +48,16 @@ fn main() {
     let layers = LAYERS;
 
     for layer in 1..=layers {
+        dt = Local::now();
+        start = dt.timestamp_millis();
         println!("Layer {} size {} start", layer, graph.size());
         for node in 0..graph.size() {
             let mut cache_parents = [0u32; DEGREE];
             graph.parents(node as usize, &mut cache_parents[..]).unwrap();
+            println!("Node {} parents {:?}", node, cache_parents);
         }
-        println!("Layer {} done", layer);
+        dt = Local::now();
+        println!("Layer {} done within {}", layer, dt.timestamp_millis() - start);
     }
 
     dt = Local::now();
