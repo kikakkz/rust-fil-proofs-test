@@ -10,6 +10,9 @@ use rand_xorshift::XorShiftRng;
 // use storage_proofs::hasher::Hasher;
 // use paired::bls12_381::Fr;
 
+extern crate chrono;
+use chrono::prelude::*;
+
 const SEED: [u8; 16] = [
     0x59, 0x62, 0xbe, 0x5d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06, 0xbc, 0xe5,
 ];
@@ -63,6 +66,9 @@ fn main() {
     // let prover_fr: <Tree::Hasher as Hasher>::Domain = Fr::random(rng).into();
     // prover_id.copy_from_slice(AsRef::<[u8]>::as_ref(&prover_fr));
 
+    let mut dt = Local::now();
+    println!("start pre phase1 at {}", dt.timestamp_millis());
+
     let phase1_out = filecoin_proofs::seal_pre_commit_phase1::<_, _, _, Tree>(
         config,
         CACHE_PATH,
@@ -74,6 +80,9 @@ fn main() {
         &piece_infos,
     ).expect("failed");
 
+    let mut dt = Local::now();
+    println!("start pre phase2 at {}", dt.timestamp_millis());
+
     let pre_commit_out = filecoin_proofs::seal_pre_commit_phase2(
         config, phase1_out, CACHE_PATH, SEALED).expect("failed");
 
@@ -81,6 +90,9 @@ fn main() {
 
     let comm_d = pre_commit_out.comm_d.clone();
     let comm_r = pre_commit_out.comm_r.clone();
+
+    let mut dt = Local::now();
+    println!("start commit phase1 at {}", dt.timestamp_millis());
 
     let phase1_out = filecoin_proofs::seal_commit_phase1::<_, Tree>(
         config,
@@ -94,7 +106,9 @@ fn main() {
         &piece_infos,
     ).expect("fail");
 
-    println!("start phase2");
+    let mut dt = Local::now();
+    println!("start commit phase2 at {}", dt.timestamp_millis());
+
     let commit_out = filecoin_proofs::seal_commit_phase2(
         config,
         phase1_out,
@@ -102,7 +116,9 @@ fn main() {
         sector_id,
     ).expect("fail");
 
-    println!("start verify");
+    let mut dt = Local::now();
+    println!("start verify at {}", dt.timestamp_millis());
+
     let verified = filecoin_proofs::verify_seal::<Tree>(
         config,
         comm_r,
@@ -115,6 +131,6 @@ fn main() {
     ).expect("fail");
 
     assert!(verified, "fail to verify valid seal");
-
-    println!("hello world!");
+    let mut dt = Local::now();
+    println!("all done at {}", dt.timestamp_millis());
 }
