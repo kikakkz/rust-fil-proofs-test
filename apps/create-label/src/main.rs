@@ -27,7 +27,7 @@ fn main() {
 
     let mut dt = Local::now();
     let mut start = dt.timestamp_millis();
-	let array = vec![0; SIZE];
+    let array = vec![0; SIZE];
 
     println!("create DRG at {} with size {}", dt.timestamp_millis(), SIZE);
     let graph = StackedBucketGraph::<DefaultPieceHasher>::new_stacked(
