@@ -17,18 +17,42 @@ const SEED: [u8; 16] = [
 fn main() {
     fil_logger::init();
 
-    let file = std::fs::File::open("/home/yt/test/s-t0121479-0").expect("failed");
-    let unsealed = std::fs::File::create("/home/yt/test/PPPiece.ttt").expect("failed");
+	let ROOT_TARGET: &str = "/home/yt/test/";
+	let CACHE_PATH: &str = &(ROOT_TARGET.to_owned() + "cache");
+
+	let ROOT_2K: &str = "./";
+	let SRC_2K: &str = "tt";
+	let UNSEAL_2K: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt.2k");
+	let SEALED_2K: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt.sealed.2k");
+	let SIZE_2K: u64 = 2032;
+	let SECTOR_SIZE_2K: u64 = 2048;
+
+	let ROOT_32GB: &str = ROOT_TARGET;
+	let SRC_32GB: &str = "s-t0121479-0";
+	let UNSEAL_32GB: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt");
+	let SEALED_32GB: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt.sealed");
+	let SIZE_32GB: u64 = 34359738368-21-270549100+2130308-16774+131;
+	let SECTOR_SIZE_32GB: u64 = 32 * 1024 * 1024 * 1024;
+
+	let ROOT: &str = ROOT_2K;
+	let SRC: &str = SRC_2K;
+	let UNSEAL: &str = UNSEAL_2K;
+	let SEALED: &str = SEALED_2K;
+	let SIZE: u64 = SIZE_2K;
+	let SECTOR_SIZE: u64 = SECTOR_SIZE_2K;
+
+    let file = std::fs::File::open(SRC).expect("failed");
+    let unsealed = std::fs::File::create(UNSEAL).expect("failed");
     let (piece_info, _) = filecoin_proofs::add_piece(&file, &unsealed,
-                               filecoin_proofs::UnpaddedBytesAmount(34359738368-21-270549100+2130308-16774+131),
+                               filecoin_proofs::UnpaddedBytesAmount(SIZE),
                                &[]).expect("failed");
     let piece_infos = vec![piece_info];
-    let _sealed = std::fs::File::create("/home/yt/test/PPPiece.ttt.sealed").expect("failed");
+    let _sealed = std::fs::File::create(SEALED).expect("failed");
 
     let config = PoRepConfig {
-        sector_size: SectorSize(34359738368),
+        sector_size: SectorSize(SECTOR_SIZE),
         partitions: PoRepProofPartitions(
-            *POREP_PARTITIONS.read().unwrap().get(&34359738368).unwrap(),
+            *POREP_PARTITIONS.read().unwrap().get(&SECTOR_SIZE).unwrap(),
         ),
     };
 
@@ -41,9 +65,9 @@ fn main() {
 
     let phase1_out = filecoin_proofs::seal_pre_commit_phase1::<_, _, _, Tree>(
         config,
-        "/home/yt/test/cache",
-        "/home/yt/test/PPPiece.ttt",
-        "/home/yt/test/PPPiece.ttt.sealed",
+        CACHE_PATH,
+		UNSEAL,
+		SEALED,
         prover_id,
         sector_id,
         ticket,
@@ -51,7 +75,7 @@ fn main() {
     ).expect("failed");
 
     let pre_commit_out = filecoin_proofs::seal_pre_commit_phase2(
-        config, phase1_out, "/home/yt/test/cache", "/home/yt/test/PPPiece.ttt.sealed").expect("failed");
+        config, phase1_out, CACHE_PATH, SEALED).expect("failed");
 
     let seed = rng.gen();
 
@@ -60,8 +84,8 @@ fn main() {
 
     let phase1_out = filecoin_proofs::seal_commit_phase1::<_, Tree>(
         config,
-        "/home/yt/test/cache",
-        "/home/yt/test/PPPiece.ttt.sealed",
+		CACHE_PATH,
+		SEALED,
         prover_id,
         sector_id,
         ticket,
