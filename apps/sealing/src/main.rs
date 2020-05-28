@@ -20,42 +20,42 @@ const SEED: [u8; 16] = [
 fn main() {
     fil_logger::init();
 
-	let ROOT_TARGET: &str = "/home/yt/test/";
-	let CACHE_PATH: &str = &(ROOT_TARGET.to_owned() + "cache");
+	let root_target: &str = "/home/yt/test/";
+	let cache_path: &str = &(root_target.to_owned() + "cache");
 
-	let ROOT_2K: &str = "./";
-	let SRC_2K: &str = "tt";
-	let UNSEAL_2K: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt.2k");
-	let SEALED_2K: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt.sealed.2k");
-	let SIZE_2K: u64 = 2032;
-	let SECTOR_SIZE_2K: u64 = 2048;
+	let root_2k: &str = "./";
+	let src_2k: &str = "tt";
+	let unseal_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.2k");
+	let sealed_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed.2k");
+	let size_2k: u64 = 2032;
+	let sector_size_2k: u64 = 2048;
 
-	let ROOT_32GB: &str = ROOT_TARGET;
-	let SRC_32GB: &str = "s-t0121479-0";
-	let UNSEAL_32GB: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt");
-	let SEALED_32GB: &str = &(ROOT_TARGET.to_owned() + "PPPiece.ttt.sealed");
-	let SIZE_32GB: u64 = 34359738368-21-270549100+2130308-16774+131;
-	let SECTOR_SIZE_32GB: u64 = 32 * 1024 * 1024 * 1024;
+	let root_32gb: &str = root_target;
+	let src_32gb: &str = "s-t0121479-0";
+	let unseal_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt");
+	let sealed_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed");
+	let size_32gb: u64 = 34359738368-21-270549100+2130308-16774+131;
+	let sector_size_32gb: u64 = 32 * 1024 * 1024 * 1024;
 
-	let ROOT: &str = ROOT_2K;
-	let SRC: &str = SRC_2K;
-	let UNSEAL: &str = UNSEAL_2K;
-	let SEALED: &str = SEALED_2K;
-	let SIZE: u64 = SIZE_2K;
-	let SECTOR_SIZE: u64 = SECTOR_SIZE_2K;
+	let root: &str = root_2k;
+	let src: &str = src_2k;
+	let unseal: &str = unseal_2k;
+	let sealed: &str = sealed_2k;
+	let size: u64 = size_2k;
+	let sector_size: u64 = sector_size_2k;
 
-    let file = std::fs::File::open(SRC).expect("failed");
-    let unsealed = std::fs::File::create(UNSEAL).expect("failed");
+    let file = std::fs::File::open(src).expect("failed");
+    let unsealed = std::fs::File::create(unseal).expect("failed");
     let (piece_info, _) = filecoin_proofs::add_piece(&file, &unsealed,
-                               filecoin_proofs::UnpaddedBytesAmount(SIZE),
+                               filecoin_proofs::UnpaddedBytesAmount(size),
                                &[]).expect("failed");
     let piece_infos = vec![piece_info];
-    let _sealed = std::fs::File::create(SEALED).expect("failed");
+    let _sealed = std::fs::File::create(sealed).expect("failed");
 
     let config = PoRepConfig {
-        sector_size: SectorSize(SECTOR_SIZE),
+        sector_size: SectorSize(sector_size),
         partitions: PoRepProofPartitions(
-            *POREP_PARTITIONS.read().unwrap().get(&SECTOR_SIZE).unwrap(),
+            *POREP_PARTITIONS.read().unwrap().get(&sector_size).unwrap(),
         ),
     };
 
@@ -72,9 +72,9 @@ fn main() {
 
     let phase1_out = filecoin_proofs::seal_pre_commit_phase1::<_, _, _, Tree>(
         config,
-        CACHE_PATH,
-		UNSEAL,
-		SEALED,
+        cache_path,
+		unseal,
+		sealed,
         prover_id,
         sector_id,
         ticket,
@@ -86,7 +86,7 @@ fn main() {
 	start = dt.timestamp_millis();
 
     let pre_commit_out = filecoin_proofs::seal_pre_commit_phase2(
-        config, phase1_out, CACHE_PATH, SEALED).expect("failed");
+        config, phase1_out, cache_path, sealed).expect("failed");
 
     let seed = rng.gen();
 
@@ -99,8 +99,8 @@ fn main() {
 
     let phase1_out = filecoin_proofs::seal_commit_phase1::<_, Tree>(
         config,
-		CACHE_PATH,
-		SEALED,
+		cache_path,
+		sealed,
         prover_id,
         sector_id,
         ticket,
