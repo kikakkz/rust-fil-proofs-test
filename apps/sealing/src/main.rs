@@ -23,26 +23,25 @@ fn main() {
 	let root_target: &str = "/home/yt/test/";
 	let cache_path: &str = &(root_target.to_owned() + "cache");
 
-	let root_2k: &str = "./";
-	let src_2k: &str = "tt";
-	let unseal_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.2k");
-	let sealed_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed.2k");
-	let size_2k: u64 = 2032;
-	let sector_size_2k: u64 = 2048;
+	let _root_2k: &str = "./";
+	let _src_2k: &str = "tt";
+	let _unseal_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.2k");
+	let _sealed_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed.2k");
+	let _size_2k: u64 = 2032;
+	let _sector_size_2k: u64 = 2048;
 
-	let root_32gb: &str = root_target;
-	let src_32gb: &str = "s-t0121479-0";
-	let unseal_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt");
-	let sealed_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed");
-	let size_32gb: u64 = 34359738368-21-270549100+2130308-16774+131;
-	let sector_size_32gb: u64 = 32 * 1024 * 1024 * 1024;
+	let _root_32gb: &str = root_target;
+	let _src_32gb: &str = "s-t0121479-0";
+	let _unseal_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt");
+	let _sealed_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed");
+	let _size_32gb: u64 = 34359738368-21-270549100+2130308-16774+131;
+	let _sector_size_32gb: u64 = 32 * 1024 * 1024 * 1024;
 
-	let root: &str = root_2k;
-	let src: &str = src_2k;
-	let unseal: &str = unseal_2k;
-	let sealed: &str = sealed_2k;
-	let size: u64 = size_2k;
-	let sector_size: u64 = sector_size_2k;
+	let src: &str = _src_2k;
+	let unseal: &str = _unseal_2k;
+	let sealed: &str = _sealed_2k;
+	let size: u64 = _size_2k;
+	let sector_size: u64 = _sector_size_2k;
 
     let file = std::fs::File::open(src).expect("failed");
     let unsealed = std::fs::File::create(unseal).expect("failed");
