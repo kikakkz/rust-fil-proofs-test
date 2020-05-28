@@ -19,7 +19,7 @@ use storage_proofs::hasher::Sha256Domain;
 extern crate chrono;
 use chrono::prelude::*;
 
-const SIZE: usize = 32 * 1024 * 1024 * 1024;
+const SIZE: usize = 1024 * 1024;
 const LAYERS: i8 = 2;
 
 fn main() {
