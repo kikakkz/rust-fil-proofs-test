@@ -72,11 +72,22 @@ seal_pre_commit_phase1 生成SDR
 			  |-> layer_challenges：layers和max_count，用法和意义待明确
 		|-> partitions：来自porep_config的PorepProofsPartitions，从POREP_PARTITIONS获取
   |-> CompoundProof::setup -> PublicParams
+        |-> S::setup (vanilla/proof_scheme.rs) 创建StackedDRG
   |-> Build merkle tree for Sector original data：config - merkle tree存储结构，comm_d - merkle root
         |-> create_base_merkle_tree 创建merkle tree，存储到cache下面的tree_d文件
-  |-> verify_pieces 算法还不明确，需要进一步研究
-  |-> 问题: sector和piece_infos是什么关系?
+  |-> verify_pieces 使用各个piece的merkle root作为输入计算sector的merkle root，与create_base_merkle_tree中的merkle root比较
+  |-> replicate_phase1
+        |-> generate_labels
+              |-> create_label / create_label_exp 生成一层label
+  |-> Output: labels, labels config, comm_d
 
+seal_pre_commit_phase2 生成column hash
+  |-> 从replica_path载入原始数据
+  |-> 从tree_d载入原始数据merkle tree
+  |-> compound_proof::SetupParams
+  |-> CompoundProof::setup -> PublicParams
+  |-> replicate_phase2
+        |-> transform_and_replicate_layers_inner
 
 
 
