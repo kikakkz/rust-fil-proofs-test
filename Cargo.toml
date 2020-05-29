@@ -11,5 +11,6 @@ members = [
   "apps/sealing",
   "apps/create-label",
   "apps/merkle-tree",
-  "apps/drg-parents"
+  "apps/drg-parents",
+  "apps/fr32-reader"
 ]

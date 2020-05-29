@@ -24,7 +24,7 @@ fn main() {
     let cache_path: &str = &(root_target.to_owned() + "cache");
 
     let _root_2k: &str = "./";
-    let _src_2k: &str = "tt";
+    let _src_2k: &str = "./apps/data/tt";
     let _unseal_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.2k");
     let _sealed_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed.2k");
     let _size_2k: u64 = 2032;
