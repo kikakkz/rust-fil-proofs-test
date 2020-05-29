@@ -9,6 +9,8 @@ use filecoin_proofs::*;
 use rand_xorshift::XorShiftRng;
 // use storage_proofs::hasher::Hasher;
 // use paired::bls12_381::Fr;
+use std::io::SeekFrom;
+use std::io::Seek;
 
 extern crate chrono;
 use chrono::prelude::*;
@@ -28,7 +30,7 @@ fn main() {
     let _unseal_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.2k");
     let _sealed_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed.2k");
     let _size_2k: u64 = 2032;
-    let _sector_size_2k: u64 = 2048;
+    let _sector_size_2k: u64 = 4096;
 
     let _root_32gb: &str = root_target;
     let _src_32gb: &str = "s-t0121479-0";
@@ -43,12 +45,17 @@ fn main() {
     let size: u64 = _size_2k;
     let sector_size: u64 = _sector_size_2k;
 
-    let file = std::fs::File::open(src).expect("failed");
+    let mut file = std::fs::File::open(src).expect("failed");
     let unsealed = std::fs::File::create(unseal).expect("failed");
-    let (piece_info, _) = filecoin_proofs::add_piece(&file, &unsealed,
+    let (piece_info1, _) = filecoin_proofs::add_piece(&file, &unsealed,
                                filecoin_proofs::UnpaddedBytesAmount(size),
                                &[]).expect("failed");
-    let piece_infos = vec![piece_info];
+    file.seek(SeekFrom::Start(0)).expect("fail");
+    let file = std::fs::File::open(src).expect("failed");
+    let (piece_info2, _) = filecoin_proofs::add_piece(&file, &unsealed,
+                               filecoin_proofs::UnpaddedBytesAmount(size),
+                               &[]).expect("failed");
+    let piece_infos = vec![piece_info1, piece_info2];
     let _sealed = std::fs::File::create(sealed).expect("failed");
 
     let config = PoRepConfig {
