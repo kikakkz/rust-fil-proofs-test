@@ -1,0 +1,84 @@
+Filecoin的算法
+
+create_base_merkle_tree 定义leaf拆分方法f，f以闭包函数访问数据data，因此data不需要作为参数传递到下一层调用。
+  |-> from_par_iter/from_par_iter_with_config 从原始数据生成merkle tree，调用f完成数据拆分。根据原始数据size预先计算好tree height，供验证使用。
+        |-> populate_data_par 将原始数据填充到叶子节点，注意，此处并未做hash，只搬运原数据
+			  |-> iter.opt_len  用32 bytes node迭代器计算出叶子数
+		      |-> iter.chunks(BUILD_DATA_BLOCK_SIZE) iter为32 bytes node迭代器，BUILD_DATA_BLOCK_SIZE为64 * BUILD_CHUNK_NODES，每次迭代处理8M数据，多个迭代可以并行填充
+		|-> S::build 按层生成merkle tree，叶子节点为原始数据
+			  |-> process_layer 生成一层节点
+			        |-> Vec::from_iter 并行计算该层merkle tree节点hash值，并将结果保存到上层创建的buffer的层开始位置
+			        |-> chunk_size 节点叶子数据size总和
+					|-> chunk_nodes 节点叶子数组
+					|-> Sha256Domain::multi_node 计算hash(将叶子节点合并计算hash)
+					|-> part.hash 填充hash源数据
+						  |-> sha2ni::Engine256::input
+					|-> self.hash 为填充数据计算hash
+						  |-> self.0.clone
+						  |-> c.result
+							    |-> sha2ni::Engine256::finish 计算hash
+						  |-> r.as_ref 提取hash结果
+					      |-> h.copy_from_slice(ra) copy hash结果
+					|-> 结论：merkle tree的buffer开始部分数据与原始数据相同
+					|-> 问题：为何不将外部buffer传递到create_base_merkle_tree以节省32GiB内存？
+		
+StackedBucketGraph new_stacked 创建SDR graph
+  |-> 带入随机数seed，防止使用固定graph关系
+  |-> 每张graph内依赖关系是固定的
+  |-> base_degree
+  |-> expansion_degree
+  |-> feistel::precompute -> feistel_precomputed
+  |-> if use_cache -> parent_cache 并行创建每层parents cache
+        |-> cache创建parent消耗：219290 ms；创建一层labels：26065 ms
+		|-> cache创建一层labels消耗: 6922820 ms
+		|-> 无cache单层label创建消耗：7733041 ms
+		|-> 11层SDR P1阶段节省：811 * 11 / 60 = 148 Min(E5 2682V4 2.5GHz)
+  |-> 问题：能不能使用固定column关系，加快labels的计算?
+  |-> new_seed是一个本地seed，在SDR算法上可能存在可利用空间，有可能可以事先生成很多seed并生成parents_cache，待研究?
+		
+create_label 生成一层SDR label
+  |-> 第一个32 bytes node：sha256.finish()结果放入layer_labels第一个32 bytes
+  |-> 第二个之后 graph.copy_parents_data -> copy_parents_data_inner / copy_parents_data_inner_exp
+		|-> 第一层以全0作为输入，第二层后以上一层结果作为输入
+        |-> 从node计算parents，或者从cache获取
+		|-> read_node 读取parents对应node layer label，第一层只读取base degree即6个parents node, copy 6组，第二层后读取全部，copy 3组，包括base和expansion
+		|-> hasher.finish_with 将parents node数据与node数据一起hash
+		
+add_piece 添加piece到sector
+  |-> Fr32Reader { data: u64 } -> Deref后data地址作为buffer使用
+  |-> sum_piece_bytes_with_alignment 获取已经写入的bytes
+  |-> get_piece_alignment
+        |-> MINIMUM_RESERVED_BYTES_FOR_PIECE_IN_FULLY_ALIGNED_SECTOR 127 bytes MIN_PIECE_SIZE
+		|-> piece alignment size是MIN_PIECE_SIZE的2的整数次方倍
+  |-> Fr32Reader::read 读取原始数据并作Fr32编码
+		|-> TARGET_BITS 256, DATA_BITS 254 (可能：每256 bits中，前254 bits为有效数据，最后两个bits为0)
+        |-> read_bytes 填充一次buffer并编码，target为64 bytes
+		      |-> full_buffer 读取8 bytes作为u64填充到buffer的data中
+			  |-> 每次读取8 bytes，前三个8 bytes即24 bytes原样填入target
+			  |-> 最后一个8 bytes按照如下规则填入target
+			        |-> 4 bytes, 2 bytes, 1 bytes分三次直接填入
+					|-> 最后1 byte填入00xxxxxx，其余byte依次后延，每64 bytes延续以上规则
+  |-> 对fr32_reader读取结果每64 bytes计算hash (commitment的叶子节点)
+  |-> 将commitment从叶子节点生成merkle tree
+  |-> PieceInfo: comm为merkle root，n为padded write bytes，written为原始piece size
+  
+seal_pre_commit_phase1 生成SDR
+  |-> compound_proof::SetupParams
+        |-> vanilla_params
+		      |-> nodes: sector_size / 32
+			  |-> degree: base_degree(6)
+			  |-> expansion_degree: 8
+			  |-> seed: DRG_SEED 固定值
+			  |-> layer_challenges：layers和max_count，用法和意义待明确
+		|-> partitions：来自porep_config的PorepProofsPartitions，从POREP_PARTITIONS获取
+  |-> CompoundProof::setup -> PublicParams
+  |-> Build merkle tree for Sector original data：config - merkle tree存储结构，comm_d - merkle root
+        |-> create_base_merkle_tree 创建merkle tree，存储到cache下面的tree_d文件
+  |-> verify_pieces 算法还不明确，需要进一步研究
+  |-> 问题: sector和piece_infos是什么关系?
+
+
+
+
+
+
