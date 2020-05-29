@@ -27,15 +27,15 @@ fn main() {
 
     let _root_2k: &str = "./";
     let _src_2k: &str = "./apps/data/tt";
-    let _unseal_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.2k");
-    let _sealed_2k: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed.2k");
+    let _unseal_2k: &str = &(cache_path.to_owned() + "PPPiece.ttt.2k");
+    let _sealed_2k: &str = &(cache_path.to_owned() + "PPPiece.ttt.sealed.2k");
     let _size_2k: u64 = 2032;
-    let _sector_size_2k: u64 = 4096;
+    let _sector_size_2k: u64 = 2048 * 8;
 
     let _root_32gb: &str = root_target;
     let _src_32gb: &str = "s-t0121479-0";
-    let _unseal_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt");
-    let _sealed_32gb: &str = &(root_target.to_owned() + "PPPiece.ttt.sealed");
+    let _unseal_32gb: &str = &(cache_path.to_owned() + "PPPiece.ttt");
+    let _sealed_32gb: &str = &(cache_path.to_owned() + "PPPiece.ttt.sealed");
     let _size_32gb: u64 = 34359738368-21-270549100+2130308-16774+131;
     let _sector_size_32gb: u64 = 32 * 1024 * 1024 * 1024;
 
