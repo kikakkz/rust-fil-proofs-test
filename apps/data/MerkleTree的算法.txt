@@ -116,7 +116,7 @@ seal_pre_commit_phase2 生成column hash
   |-> 待研究：相同的hash过程使用不同hash算法的实现机制
   |-> 问题: get_base_tree_count / tree_count > 1的场景是什么?
 
-seal_commit_phase1
+seal_commit_phase1 验证全部partition的merkle tree
   |-> verify_pieces 验证merkle tree
   |-> generate_replica_id 从prover_id, sector_id, ticker, comm_d创建replica_id
   |-> PublicInputs {replica_id, tau {comm_d, comm_r}, seed}
@@ -153,8 +153,26 @@ seal_commit_phase1
         |-> proof.verify 验证proof -> 还没有看懂！！
   |-> SealCommitPhase1Output {vanilla_proofs, comm_r, comm_d, replica_id, seed, ticket}
 
+seal_commit_phase2 生成zk-SNARKs proofs
+  |-> get_stacked_params
+        |-> parameters_generator 从cache生成groth_params -> Bls12
+  |-> compound_proof::SetupParams
+  |-> CompoundProof::setup
+  |-> StackedCompound::<Tree, DefaultPieceHasher>::circuit_proofs 生成groth_proofs
+        |-> vanilla_proof 构建circuits
+              |-> circuit StackedCircuit
+  |-> groth16::create_random_proof_batch / groth16::create_random_proof_batch_in_priority 生成groth_proofs
+  |-> 将proof写入buf
+  |-> verify_seal 验证封装和proof
+        |-> get_stacked_verify_key 从cache加载vk
+        |-> MultiProof::new_from_reader 从proof准备MultiProof
+        |-> StackedCompound::verify
+              |-> groth16::verify_proofs_batch
+  |-> 输出 SealCommitOutput {proof: buf}
 
-
+TODO:
+challenge算法
+groth16 proofs算法
 
 
 
