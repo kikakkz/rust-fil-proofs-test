@@ -69,7 +69,7 @@ seal_pre_commit_phase1 生成SDR
               |-> degree: base_degree(6)
               |-> expansion_degree: 8
               |-> seed: DRG_SEED 固定值
-              |-> layer_challenges：layers和max_count，用法和意义待明确
+              |-> layer_challenges：layers和max_count，layers为SDR层数，max_count为challenges count
         |-> partitions：来自porep_config的PorepProofsPartitions，从POREP_PARTITIONS获取
   |-> CompoundProof::setup -> PublicParams
         |-> S::setup (vanilla/proof_scheme.rs) 创建StackedDRG
@@ -115,6 +115,45 @@ seal_pre_commit_phase2 生成column hash
   |-> 输出 SealPreCommitOutput {comm_r, comm_d}
   |-> 待研究：相同的hash过程使用不同hash算法的实现机制
   |-> 问题: get_base_tree_count / tree_count > 1的场景是什么?
+
+seal_commit_phase1
+  |-> verify_pieces 验证merkle tree
+  |-> generate_replica_id 从prover_id, sector_id, ticker, comm_d创建replica_id
+  |-> PublicInputs {replica_id, tau {comm_d, comm_r}, seed}
+  |-> PrivateInputs {t_aux, p_aux}
+  |-> compound_proof::SetupParams
+  |-> CompoundProof::setup
+  |-> StackedDrg::prove_all_partitions 创建vanilla_proofs
+        |-> prove_layers
+              |-> get_drg_parents_columns 获取x位置的parents位置，此处只获取base_degree
+                    |-> graph.base_parents
+                    |-> columns.push
+              |-> get_exp_parents_columns 获取x位置的parents位置，只获取expansion degree
+                    |-> graph.expanded_parents
+            　|-> 分别prove各partitions
+            　　　  |-> pub_inputs.challenges 获取challenges位置
+                          |-> derive_internal 生成challenge位置
+                          　　  |-> j = challenges_count * k + i i为当前challenge计数, k为partition id
+                          　　  |-> hash = Sha256 replica_id, seed, j
+                                |-> challenge = BigUint(hash) % (leaves - 1) + 1
+                                |-> 待研究：唯一的随机量seed怎么来的？
+                    |-> 针对每个challenge生成证明
+                          |-> t_aux,tree_d.gen_proof 从t_aux生成challenge位置的comm_d_proof
+                                |-> MerkleTree::gen_proof
+                                |-> MerkleProof::try_from_proof
+                          |-> 获取当前challenge位置的c_x，drg_parents，exp_parents
+                          　　  |-> c_x = t_aux.column(challenge).into_proof(tree_c) column创建整列labels
+                                      |-> tree_c.gen_proof
+                                      |-> ColumnProof::from_column
+                          |-> comm_r_last_proof = t_aux.tree_r_last.gen_cached_proof
+                          |-> 待研究：特定challenge位置的proof构建
+              |-> 输出：all_partition_proofs　针对所有partition的proof
+  |-> verify_all_partitions verify从challenge位置数据构建的all_partition_proofs
+        |-> 比较tau中的comm_r与从proofs中计算的comm_r是否匹配
+        |-> proof.verify 验证proof -> 还没有看懂！！
+  |-> SealCommitPhase1Output {vanilla_proofs, comm_r, comm_d, replica_id, seed, ticket}
+
+
 
 
 
