@@ -108,11 +108,13 @@ seal_pre_commit_phase2 生成column hash
                           |-> 将key和data_node做Fr转换 此处Fr转换与Fr32编码不一样，不知细节～～
                           |-> key与data_node当作整数相加，结果为result result.add_asign和result.into
                           |-> 上两步都是在Poseidon hash中做计算，调用fff的实现，细节待研究
-              |-> 从encoded_data生成tree_r_last 此处使用Poseidon hash，只能使用CPU
+              |-> trees.push 从encoded_data生成tree_r_last，可能有多个config生成多棵8叉树，此处使用Poseidon hash，只能使用CPU
+              |-> create_lc_tree 生成tree_r_last，将多棵8叉树生成扇区的tree_r_last
               |-> comm_r = H(comm_c || comm_r_last) Poseidon::hash2 fr.into再次出现
             　|-> 输出 tau {comm_d, comm_r}, p_aux {comm_c, comm_r_last}, t_aux {labels_config, tree_d_config, tree_r_last_config, tree_c_config}
   |-> 输出 SealPreCommitOutput {comm_r, comm_d}
   |-> 待研究：相同的hash过程使用不同hash算法的实现机制
+  |-> 问题: get_base_tree_count / tree_count > 1的场景是什么?
 
 
 
