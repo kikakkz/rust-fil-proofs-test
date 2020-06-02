@@ -168,4 +168,23 @@ fn main() {
     assert!(verified, "fail to verify valid seal");
     dt = Local::now();
     println!("finish verify within {}", dt.timestamp_millis() - start);
+
+    let sector_count = WINNING_POST_SECTOR_COUNT;
+    let post_config = PoStConfig {
+        sector_size: size.into(),
+        sector_count,
+        challenge_count: WINNING_POST_CHALLENGE_COUNT,
+        typ: PoStType::Winning,
+        priority: false,
+    };
+    // let random_fr: DefaultTreeDomain = Fr::random(rng).into();
+    let randomness = [0u8; 32];
+    // randomness.copy_from_slice(AsRef::<[u8]>::as_ref(&random_fr));
+    let challenge_sectors = generate_winning_post_sector_challenge::<Tree>(
+        &post_config,
+        &randomness,
+        sector_count as u64,
+        prover_id,
+    ).expect("fail");
+    println!("Challenge sectors {:?}", challenge_sectors);
 }
