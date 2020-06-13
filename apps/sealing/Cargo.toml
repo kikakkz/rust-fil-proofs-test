@@ -11,3 +11,4 @@ rand_xorshift = "0.2.0"
 paired = "0.18.0"
 fil_logger = "0.1"
 chrono = "0.4"
+ff = { version = "0.2.1", package = "fff" }
