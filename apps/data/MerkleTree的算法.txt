@@ -161,7 +161,8 @@ seal_commit_phase2 生成zk-SNARKs proofs
   |-> StackedCompound::<Tree, DefaultPieceHasher>::circuit_proofs 生成groth_proofs
         |-> vanilla_proof 构建circuits
               |-> circuit StackedCircuit
-  |-> groth16::create_random_proof_batch / groth16::create_random_proof_batch_in_priority 生成groth_proofs
+        |-> groth16::create_random_proof_batch / groth16::create_random_proof_batch_in_priority 生成groth_proofs
+              |-> create_proof_batch_priority
   |-> 将proof写入buf
   |-> verify_seal 验证封装和proof
         |-> get_stacked_verify_key 从cache加载vk
