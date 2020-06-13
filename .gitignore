@@ -2,7 +2,6 @@
 **/*.rs.bk
 Cargo.lock
 .criterion
-**/*.h
 heaptrack*
 .bencher
 *.profile
