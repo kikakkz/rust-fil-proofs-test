@@ -12,5 +12,6 @@ members = [
   "apps/create-label",
   "apps/merkle-tree",
   "apps/drg-parents",
-  "apps/fr32-reader"
+  "apps/fr32-reader",
+  "apps/sha256-rust"
 ]

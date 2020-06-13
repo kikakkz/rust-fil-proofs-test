@@ -1,0 +1,9 @@
+[package]
+name = "sha256-rust"
+version = "0.1.0"
+authors = ["Zhao KK <kikakkz@hotmail.com>"]
+
+[dependencies]
+sha2 = { version = "0.8.3", package = "sha2ni" }
+sha2raw = { path = "../../sha2raw" }
+chrono = "0.4"
